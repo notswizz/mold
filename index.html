@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-<link rel="stylesheet" href="styles.css?v=3" />
+<link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
 
@@ -496,7 +496,7 @@
     <h2>Your family deserves clean, healthy air at home.</h2>
     <p>If you're worried about mold, don't wait and wonder. My Mold Detective gives you an easy, affordable way to test your home's air and surfaces with professional-grade sampling and lab-reviewed results.</p>
     <div class="final-ctas">
-      <a class="btn btn-light" href="#">Order Your Mold Test Kit</a>
+      <a class="btn btn-light" href="#cta">Order Your Mold Test Kit</a>
       <a class="final-secondary" href="#how">Learn How It Works</a>
     </div>
     <div class="final-micro">
@@ -522,7 +522,75 @@
   </div>
 </footer>
 
+<!-- SHOP MODAL -->
+<div class="shop-modal" id="shopModal" aria-hidden="true" role="dialog" aria-label="Order My Mold Detective kit">
+  <div class="shop-modal-backdrop" data-close></div>
+  <div class="shop-modal-frame">
+    <button class="shop-modal-close" data-close aria-label="Close shop">
+      <i class="ph-bold ph-x"></i>
+    </button>
+    <div class="shop-modal-loading" id="shopModalLoading">
+      <div class="shop-modal-spinner"></div>
+      <span>Loading shop…</span>
+    </div>
+    <iframe
+      class="shop-modal-iframe"
+      id="shopModalIframe"
+      title="My Mold Detective shop"
+      sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      referrerpolicy="no-referrer-when-downgrade"
+      loading="lazy"
+    ></iframe>
+  </div>
+</div>
+
 <script>
+  // Shop modal
+  (function() {
+    const SHOP_URL = 'https://mymolddetective.com/shop-online/';
+    const modal   = document.getElementById('shopModal');
+    const iframe  = document.getElementById('shopModalIframe');
+    const loading = document.getElementById('shopModalLoading');
+
+    let loadFallback;
+    function openShop() {
+      if (!iframe.src) iframe.src = SHOP_URL;
+      loading.style.display = 'flex';
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      clearTimeout(loadFallback);
+      loadFallback = setTimeout(() => { loading.style.display = 'none'; }, 2500);
+    }
+    function closeShop() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      clearTimeout(loadFallback);
+    }
+
+    iframe.addEventListener('load', () => {
+      clearTimeout(loadFallback);
+      loading.style.display = 'none';
+    });
+
+    // Open from any CTA that points at #cta, plus the nav CTA
+    document.querySelectorAll('a[href="#cta"], a.nav-cta').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        openShop();
+      });
+    });
+
+    modal.addEventListener('click', e => {
+      if (e.target.closest('[data-close]')) closeShop();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeShop();
+    });
+  })();
+
   // FAQ accordion
   document.querySelectorAll('#faqList .faq-q').forEach(btn => {
     btn.addEventListener('click', () => {
